@@ -42,8 +42,10 @@ def preprocess(srcPath, destPath, method, filenames):
 if __name__ == '__main__':
     proc_num = 12
     processes = []
-    srcRoot = '/mnt/e/dataset/original/images/train'
-    destRoot = '/mnt/e/dataset/processed/mix/images/train'
+    method = 'mix'
+    kind = 'test'
+    srcRoot = f'/mnt/e/dataset/original/images/{kind}'
+    destRoot = f'/mnt/e/dataset/processed/{method}/images/{kind}'
     filenames = list(os.listdir(srcRoot))
     seg_size = len(filenames) // proc_num
     for i in range(proc_num):
@@ -56,4 +58,4 @@ if __name__ == '__main__':
     for proc in processes:
         proc.join()
 
-    print('')
+    print('Process Completed!')
