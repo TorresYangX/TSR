@@ -1,17 +1,11 @@
 import os
 import cv2
+import numpy as np
 from HSVEnhancer import HSVEnhancer
 from MSER import MSER
 import matplotlib.pyplot as plt
 import argparse
-
-
-class Dataloader:   
-    def loadImgs(self, path):
-        imgFilenames = []
-        for filename in os.listdir(path):
-            imgFilenames.append(filename)
-        return imgFilenames
+from tqdm import tqdm
     
     
 class DataSaver:
@@ -24,7 +18,6 @@ class DataSaver:
         
 
 def main(args):
-    dataloader = Dataloader()
     datasaver = DataSaver()
     mser = MSER()
     hsvEnhancer = HSVEnhancer()
@@ -32,21 +25,19 @@ def main(args):
     for part in parts:
         srcPath = os.path.join(args.srcRoot, part)
         destPath = os.path.join(args.destRoot, part)
-        imgFilenames = dataloader.loadImgs(srcPath)
-        for filename in imgFilenames:
+        for filename in tqdm(os.listdir(srcPath)):
             imgpath = os.path.join(srcPath, filename)
             img = cv2.imread(imgpath)
+            original = img.copy()
             if args.method == 'HSV':
                 img = hsvEnhancer.enhance(img)
-                datasaver.saveImg(img, destPath, filename)
             elif args.method == 'MSER':
                 img = mser.preprocessing(img)
-                datasaver.saveImg(img, destPath, filename)
             else:
                 img = hsvEnhancer.enhance(img)
                 img = mser.preprocessing(img)
-                datasaver.saveImg(img, destPath, filename)
-        
+            img = (img * 0.8 + original * 0.2).astype(np.uint8) 
+            datasaver.saveImg(img, destPath, filename)
         
 
 if __name__ == '__main__':
